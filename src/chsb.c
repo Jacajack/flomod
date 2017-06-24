@@ -4,59 +4,83 @@
 #include <string.h>
 #include "chsb.h"
 
-void chsbopt( CHSB *desc, CHSB lim )
+void chsbopt( CHSB *desc, CHSB *lim )
 {
+	if ( desc == NULL || lim == NULL ) return;
+
 	//Optimize byte number
-	desc->s += desc->b / lim.b;
-	desc->b = desc->b % lim.b;
+	desc->s += desc->b / lim->b;
+	desc->b = desc->b % lim->b;
+	if ( desc->b < 0 ) desc->b = 0;
 
 	//Optimize sector number
 	if ( desc->flags & CHSB_FLAG_SECTOR_BASE1 )
 	{
 		//1-based sector numbers
-		desc->h += ( desc->s - 1 ) / lim.s;
-		desc->s = ( desc->s - 1 ) % lim.s + 1;
-		if ( desc->s == 0 ) desc->s = 1;
+		desc->h += ( desc->s - 1 ) / lim->s;
+		desc->s = ( desc->s - 1 ) % lim->s + 1;
+		if ( desc->s < 1 ) desc->s = 1;
 	}
 	else
 	{
 		//0-based sector numbers
-		desc->h += desc->s / lim.s;
-		desc->s = desc->s % lim.s;
+		desc->h += desc->s / lim->s;
+		desc->s = desc->s % lim->s;
+		if ( desc->s < 0 ) desc->s = 0;
 	}
 	//Optimize head number
-	desc->c += desc->h / lim.h;
-	desc->h = desc->h % lim.h;
+	desc->c += desc->h / lim->h;
+	desc->h = desc->h % lim->h;
+	if ( desc->h < 0 ) desc->h = 0;
+
+	//Check cylinder number bounds
+	if ( desc->c < 0 ) desc->c = 0;
 }
 
-CHSB chsbsum( CHSB *desc, CHSB val )
+void chsbsum( CHSB *desc, CHSB *offset )
 {
-	desc->c += val.c;
-	desc->h += val.h;
-	desc->s += val.s;
-	desc->b += val.b;
-	return *desc;
+	if ( desc == NULL || offset == NULL ) return;
+	desc->c += offset->c;
+	desc->h += offset->h;
+	desc->s += offset->s;
+	desc->b += offset->b;
 }
 
 //Convert CHSB structure to offset in sectors or bytes
-uint64_t chsb2lba( CHSB desc, CHSB lim )
+void chsb2lba( CHSB *desc, CHSB *lim )
 {
-	uint64_t offset = ( desc.c * lim.h + desc.h ) * lim.s + desc.s;
-	if ( desc.flags & CHSB_FLAG_SECTOR_BASE1 ) offset -= 1;
-	if ( desc.flags & CHSB_FLAG_OFFSET_BYTES ) offset = offset * lim.b + desc.b;
-	return offset;
+	if ( desc == NULL || lim == NULL ) return;
+	desc->offset = ( desc->c * lim->h + desc->h ) * lim->s + desc->s;
+	if ( desc->flags & CHSB_FLAG_SECTOR_BASE1 ) desc->offset -= 1;
+	if ( desc->flags & CHSB_FLAG_OFFSET_BYTES ) desc->offset = desc->offset * lim->b + desc->b;
+}
+
+//Convert offset in sectors or bytes to CHSB structure values
+void lba2chsb( CHSB *desc, CHSB *lim )
+{
+	if ( desc == NULL || lim == NULL ) return;
+	desc->c = desc->h = desc->s = desc->b = 0;
+	if ( desc->flags & CHSB_FLAG_OFFSET_BYTES ) desc->b = desc->offset;
+	else desc->s = desc->offset;
+	chsbopt( desc, lim );
 }
 
 //Convert colon-separated CHSB string to CHSB structure
-int str2chsb( CHSB *desc, char *s )
+int str2chsb( CHSB *desc )
 {
 	unsigned char ec = 1;
 	char *delim = ":";
 	char *str = NULL;
 	char *token = NULL;
 
-	if ( s == NULL ) return 1;
-	str = strdup( s );
+	if ( desc == NULL ) return 1;
+	desc->c = 0;
+	desc->h = 0;
+	desc->s = 0;
+	desc->b = 0;
+
+	if ( desc->str == NULL ) return 1;
+	str = strdup( desc->str );
 	if ( str == NULL ) return 1;
 
 	token = strtok( str, delim );
