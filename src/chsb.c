@@ -37,6 +37,7 @@ void chsbopt( CHSB *desc, CHSB *lim )
 	if ( desc->c < 0 ) desc->c = 0;
 }
 
+//Sum two CHSB structures (optimization not included)
 void chsbsum( CHSB *desc, CHSB *offset )
 {
 	if ( desc == NULL || offset == NULL ) return;
@@ -46,13 +47,23 @@ void chsbsum( CHSB *desc, CHSB *offset )
 	desc->b += offset->b;
 }
 
+//Check if the CHSB struct is empty
+int chsbnull( CHSB *desc )
+{
+	if ( desc == NULL ) return 1;
+	return 	desc->c == 0 && \
+			desc->h == 0 && \
+			desc->s == 0 && \
+			desc->b == 0;
+}
+
 //Convert CHSB structure to offset in sectors or bytes
 void chsb2lba( CHSB *desc, CHSB *lim )
 {
 	if ( desc == NULL || lim == NULL ) return;
 	desc->offset = ( desc->c * lim->h + desc->h ) * lim->s + desc->s;
 	if ( desc->flags & CHSB_FLAG_SECTOR_BASE1 ) desc->offset -= 1;
-	if ( desc->flags & CHSB_FLAG_OFFSET_BYTES ) desc->offset = desc->offset * lim->b + desc->b;
+	desc->offset = desc->offset * lim->b + desc->b;
 }
 
 //Convert offset in sectors or bytes to CHSB structure values
@@ -60,8 +71,7 @@ void lba2chsb( CHSB *desc, CHSB *lim )
 {
 	if ( desc == NULL || lim == NULL ) return;
 	desc->c = desc->h = desc->s = desc->b = 0;
-	if ( desc->flags & CHSB_FLAG_OFFSET_BYTES ) desc->b = desc->offset;
-	else desc->s = desc->offset;
+	desc->b = desc->offset;
 	chsbopt( desc, lim );
 }
 
