@@ -53,7 +53,7 @@ int chsbnull( CHSB *desc )
 	if ( desc == NULL ) return 1;
 	return 	desc->c == 0 && \
 			desc->h == 0 && \
-			desc->s == 0 && \
+			( desc->s == 0 || ( desc->s == 1 && desc->flags & CHSB_FLAG_SECTOR_BASE1 ) ) && \
 			desc->b == 0;
 }
 
@@ -79,7 +79,7 @@ void lba2chsb( CHSB *desc, CHSB *lim )
 int str2chsb( CHSB *desc )
 {
 	unsigned char ec = 1;
-	char *delim = ":";
+	const char *delim = ":";
 	char *str = NULL;
 	char *token = NULL;
 
@@ -111,4 +111,18 @@ int str2chsb( CHSB *desc )
 
 	free( str );
 	return ec;
+}
+
+//Generate new string representation for the CHSB structure
+const char *chsb2str( CHSB *desc )
+{
+	const char *delim = ":";
+	char str[64];
+
+	if ( desc == NULL ) return NULL;
+
+	snprintf( str, 63, "%ld%s%ld%s%ld%s%ld", desc->c, delim, desc->h, delim, desc->s, delim, desc->b );
+
+	desc->str = strdup( str );
+	return desc->str;
 }

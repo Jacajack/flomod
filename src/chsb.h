@@ -6,13 +6,13 @@
 
 typedef struct
 {
-	int64_t c;
-	int64_t h;
-	int64_t s;
-	int64_t b;
-	int64_t offset;
+	long c;
+	long h;
+	long s;
+	long b;
+	long offset;
 	const char *str;
-	uint8_t flags;
+	unsigned int flags;
 } CHSB;
 
 extern void chsbopt( CHSB *desc, CHSB *lim );
@@ -21,5 +21,6 @@ extern int chsbnull( CHSB *desc );
 extern void chsb2lba( CHSB *desc, CHSB *lim );
 extern void lba2chsb( CHSB *desc, CHSB *lim );
 extern int str2chsb( CHSB *desc );
+extern const char *chsb2str( CHSB *desc );
 
 #endif
