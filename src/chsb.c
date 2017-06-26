@@ -43,7 +43,7 @@ void chsbsum( CHSB *desc, CHSB *offset )
 	if ( desc == NULL || offset == NULL ) return;
 	desc->c += offset->c;
 	desc->h += offset->h;
-	desc->s += offset->s;
+	desc->s += offset->s - ( desc->flags & CHSB_FLAG_SECTOR_BASE1 ? 1 : 0 );
 	desc->b += offset->b;
 }
 
@@ -70,7 +70,8 @@ void chsb2lba( CHSB *desc, CHSB *lim )
 void lba2chsb( CHSB *desc, CHSB *lim )
 {
 	if ( desc == NULL || lim == NULL ) return;
-	desc->c = desc->h = desc->s = desc->b = 0;
+	desc->c = desc->h = 0;
+	desc->s = desc->flags & CHSB_FLAG_SECTOR_BASE1 ? 1 : 0;
 	desc->b = desc->offset;
 	chsbopt( desc, lim );
 }
@@ -86,7 +87,7 @@ int str2chsb( CHSB *desc )
 	if ( desc == NULL ) return 1;
 	desc->c = 0;
 	desc->h = 0;
-	desc->s = 0;
+	desc->s = desc->flags & CHSB_FLAG_SECTOR_BASE1 ? 1 : 0;
 	desc->b = 0;
 
 	if ( desc->str == NULL ) return 1;
