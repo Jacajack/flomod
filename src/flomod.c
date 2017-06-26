@@ -9,9 +9,8 @@
 #define FLOMOD_VERSION "v0.0"
 
 #define FLOMOD_FLAG_WRITE 1
-#define FLOMOD_FLAG_READ 2
-#define FLOMOD_FLAG_SECTOR_BASE1 4
-#define FLOMOD_FLAG_DEFAULT_FLOPPY 8
+#define FLOMOD_FLAG_SECTOR_BASE1 2
+#define FLOMOD_FLAG_DEFAULT_FLOPPY 4
 
 struct
 {
@@ -33,6 +32,14 @@ void help( )
 	fprintf( stderr,
 		"%s - floppy disk editor " FLOMOD_VERSION "\n" \
 		"Usage: %s filename [OPTIONS]\n" \
+		"\t-h - display this help message\n" \
+		"\t-s - specify start point in C:H:S:B format\n" \
+		"\t-n - specify read/write length in C:H:S:B format\n" \
+		"\t-e - specify end point in C:H:S:B format\n" \
+		"\t-l - specify disk geometry in C:H:S:B format\n" \
+		"\t-t - specify disk geometry from predefined list:\n" \
+		"\t\t- FLOPPY_3.5_1.44M\n" \
+		"\t\t- FLOPPY_3.5_2.88M\n" \
 		, flomod.exename, flomod.exename );
 }
 
@@ -51,42 +58,74 @@ int main( int argc, char **argv )
 		exit( 1 );
 	}
 
-	for ( i = 2; i < argc; i++ )
+	for ( i = 1; i < argc; i++ )
 	{
 		badval = 1;
 		badarg = 1;
 
 		if ( !strcmp( argv[i], "-s" ) )
+		{
 			if ( badarg = 0, ++i < argc )
-				badval = 0, flomod.start.str = strndup( argv[i], 1024 );
+			{
+				badval = 0;
+				flomod.start.str = strndup( argv[i], 1024 );
+			}
+			continue;
+		}
 
 		if ( !strcmp( argv[i], "-n" ) )
+		{
 			if ( badarg = 0, ++i < argc )
-				badval = 0, flomod.length.str = strndup( argv[i], 1024 );
+			{
+				badval = 0;
+				flomod.length.str = strndup( argv[i], 1024 );
+			}
+			continue;
+		}
 
 		if ( !strcmp( argv[i], "-l" ) )
+		{
 			if ( badarg = 0, ++i < argc )
-				badval = 0, flomod.limits.str = strndup( argv[i], 1024 );
+			{
+				badval = 0;
+				flomod.limits.str = strndup( argv[i], 1024 );
+			}
+			continue;
+		}
 
 		if ( !strcmp( argv[i], "-e" ) )
+		{
 			if ( badarg = 0, ++i < argc )
-				badval = 0, flomod.end.str = strndup( argv[i], 1024 );
+			{
+				badval = 0;
+				flomod.end.str = strndup( argv[i], 1024 );
+			}
+			continue;
+		}
 
 		if ( !strcmp( argv[i], "-t" ) )
+		{
 			if ( badarg = 0, ++i < argc )
-				badval = 0, flomod.disktype = strndup( argv[i], 1024 );
+			{
+				badval = 0;
+				flomod.disktype = strndup( argv[i], 1024 );
+			}
+			continue;
+		}
 
-		//if ( !strcmp( argv[i], "-o" ) )
-		//	if ( badarg = 0, i++ < argc )
-
+		if ( !strcmp( argv[i], "-f" ) )
+		{
+			if ( badarg = 0, ++i < argc )
+			{
+				badval = 0;
+				flomod.diskfname = strndup( argv[i], 1024 );
+			}
+			continue;
+		}
 
 		if ( !strcmp( argv[i], "-w" ) ) badarg = badval = 0, flomod.flags |= FLOMOD_FLAG_WRITE;
-		if ( !strcmp( argv[i], "-r" ) ) badarg = badval = 0, flomod.flags |= FLOMOD_FLAG_READ;
+		if ( !strcmp( argv[i], "-r" ) ) badarg = badval = 0, flomod.flags &= ~FLOMOD_FLAG_WRITE;
 		if ( !strcmp( argv[i], "-z" ) ) badarg = badval = 0, flomod.flags &= ~FLOMOD_FLAG_SECTOR_BASE1;
-
-		//if ( !strcmp( argv[i], "-o" ) )
-		//	if ( ++i < argc )
-		//	!sscanf( argv[i], "%[^\t\n]", flomod.outfilename ) ) ) {badval = 1; badarg = 0;}
 
 
 		if ( badarg )
@@ -125,6 +164,13 @@ int main( int argc, char **argv )
 		}
 	}
 
+	//No filename
+	if ( flomod.diskfname == NULL )
+	{
+		fprintf( stderr, "%s: disk file not specified!\n", flomod.exename );
+		exit( 1 );
+	}
+
 	//Default disk type
 	if ( flomod.flags & FLOMOD_FLAG_DEFAULT_FLOPPY )
 	{
@@ -145,6 +191,7 @@ int main( int argc, char **argv )
 	str2chsb( &flomod.start );
 	chsbopt( &flomod.start, &flomod.limits );
 	chsb2lba( &flomod.start, &flomod.limits );
+	chsb2str( &flomod.start );
 
 	//Get length
 	str2chsb( &flomod.length );
@@ -152,14 +199,15 @@ int main( int argc, char **argv )
 	chsb2lba( &flomod.length, &flomod.limits );
 
 	//Open disk file
-	flomod.diskfname = argv[1];
-	if ( flomod.flags & FLOMOD_FLAG_READ )
-		flomod.diskf = fopen( flomod.diskfname, "rb" );
-	else if ( flomod.flags & FLOMOD_FLAG_WRITE )
+	if ( flomod.flags & FLOMOD_FLAG_WRITE )
 	{
 		if ( access( flomod.diskfname, F_OK ) != -1 )
 			flomod.diskf = fopen( flomod.diskfname, "r+b" );
 		else flomod.diskf = fopen( flomod.diskfname, "wb" );
+	}
+	else
+	{
+		flomod.diskf = fopen( flomod.diskfname, "rb" );
 	}
 	if ( flomod.diskf == NULL )
 	{
@@ -181,8 +229,9 @@ int main( int argc, char **argv )
 		if ( chsbnull( &flomod.length ) )
 		{
 			//Calculate from detected file size
-			flomod.end.offset = flomod.disklen;
+			flomod.end.offset = flomod.disklen - 1;
 			lba2chsb( &flomod.end, &flomod.limits );
+			fprintf( stderr, "%s: no endpoint specified - reading whole file\n", flomod.exename );
 		}
 		else
 		{
@@ -195,13 +244,21 @@ int main( int argc, char **argv )
 	chsb2lba( &flomod.end, &flomod.limits );
 	chsb2str( &flomod.end );
 
-	fprintf( stderr, "%s: end at %s\n", flomod.exename, flomod.end.str );
+	fprintf( stderr, "%s: start at %s - %ld\n", flomod.exename, flomod.start.str, flomod.start.offset );
+	fprintf( stderr, "%s: end at   %s - %ld\n", flomod.exename, flomod.end.str, flomod.end.offset );
 
-	if ( flomod.flags & FLOMOD_FLAG_READ )
+	if ( flomod.flags & FLOMOD_FLAG_WRITE )
+	{
+		while ( ( ( b = getchar( ) ) != EOF ) && ( ftell( flomod.diskf ) <= flomod.end.offset ) )
+			fputc( b, flomod.diskf );
+	}
+	else
 	{
 		while ( ( ( b = fgetc( flomod.diskf ) ) != EOF ) && ( ftell( flomod.diskf ) <= flomod.end.offset ) )
 			putchar( b );
 	}
+
+	if ( b == EOF ) fprintf( stderr, "%s: EOF reached\n", flomod.exename );
 
 	//Close disk file
 	fclose( flomod.diskf );
