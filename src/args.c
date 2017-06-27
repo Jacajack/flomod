@@ -7,17 +7,18 @@ char argp_doc[] = "flomod - A program to edit floppy disk.";
 char argp_keydoc[] = "FILENAME";
 struct argp_option argp_options[] =
 {
-  {"read",   'r', 0,          0, "Read data from disk"},
-  {"write",  'w', 0,          0, "Write data to disk"},
-  {"verbose",'v', 0,          0, "Be verbose"},
-  {"start",  's', "C:H:S:B",  0, "Set start point for disk operation"},
-  {"end",    'e', "C:H:S:B",  0, "Set end point for disk operation"},
-  {"num",    'n', "C:H:S:B",  0, "Set disk operation length"},
-  {"limits", 'l', "C:H:S:B",  0, "Set disk geometry limits"},
-  {"type",   't', "TYPE",     0, "Set disk type:\n" \
+	{"read",   'r', 0,          0, "Read data from disk"},
+	{"write",  'w', 0,          0, "Write data to disk"},
+	{"verbose",'v', 0,          0, "Be verbose"},
+	{"baseone",'1', 0,          0, "Use 1 based sector numeration (like int 13h)"},
+	{"start",  's', "C:H:S:B",  0, "Set start point for disk operation"},
+	{"end",    'e', "C:H:S:B",  0, "Set end point for disk operation"},
+	{"num",    'n', "C:H:S:B",  0, "Set disk operation length"},
+	{"limits", 'l', "C:H:S:B",  0, "Set disk geometry limits"},
+	{"type",   't', "TYPE",     0, "Set disk type:\n" \
   	"FLOPPY_3.5_740K / FLOPPY_3.5_1.44M / FLOPPY_3.5_2.88M / FLOPPY_5.25_1.2M / FLOPPY_5.25_360K\n"},
 
-  {0}
+	{0}
 };
 
 error_t parse_opt( int key, char *arg, struct argp_state *state )
@@ -37,6 +38,10 @@ error_t parse_opt( int key, char *arg, struct argp_state *state )
 		case 'w':
     		conf->flags |= FLOMOD_FLAG_WRITE;
     		break;
+
+		case '1':
+			conf->flags |= FLOMOD_FLAG_SECTOR_BASE1;
+			break;
 
 		case 's':
     		conf->start.str = arg;
