@@ -173,11 +173,19 @@ int main( int argc, char **argv )
 	}
 
 	//Get file length
-	fseek( flomod.diskf, 0, SEEK_END );
+	if ( !fseek( flomod.diskf, 0, SEEK_END ) )
+	{
+		fprintf( stderr, "%s: seek error!\n", flomod.exename );
+		exit( 1 );
+	}
 	flomod.disklen = ftell( flomod.diskf );
 
 	//Seek to place pointed by start descriptor
-	fseek( flomod.diskf, flomod.start.offset, SEEK_SET );
+	if ( !fseek( flomod.diskf, flomod.start.offset, SEEK_SET ) )
+	{
+		fprintf( stderr, "%s: seek error!\n", flomod.exename );
+		exit( 1 );
+	}
 
 	//Calculate end descriptor
 	str2chsb( &flomod.end );
