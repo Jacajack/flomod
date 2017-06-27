@@ -9,12 +9,14 @@
 #include "args.h"
 #include "flomod.h"
 
+//Main configuration structure (all flags etc.)
 struct flomod flomod;
 
 int main( int argc, char **argv )
 {
 	int i, b;
 
+	//Hardcoded executable name (I'm sorry)
 	flomod.exename = "flomod";
 
 	//Parse command line arguments
@@ -39,11 +41,11 @@ int main( int argc, char **argv )
 				}
 			}
 
-			//Not found - default once more
+			//Unknown disk type - quit
 			if ( i == DISKTYPE_COUNT )
 			{
 				fprintf( stderr, "%s: unknown disk type\n", flomod.exename );
-				flomod.flags |= FLOMOD_FLAG_DEFAULT_FLOPPY;
+				exit( 1 );
 			}
 		}
 	}
@@ -51,7 +53,7 @@ int main( int argc, char **argv )
 	//No filename
 	if ( flomod.diskfname == NULL )
 	{
-		fprintf( stderr, "%s: disk file not specified!\n", flomod.exename );
+		if ( flomod.flags & FLOMOD_FLAG_VERBOSE ) fprintf( stderr, "%s: disk file not specified!\n", flomod.exename );
 		exit( 1 );
 	}
 
@@ -59,7 +61,7 @@ int main( int argc, char **argv )
 	if ( flomod.flags & FLOMOD_FLAG_DEFAULT_FLOPPY )
 	{
 		flomod.limits = disktypes[DISKTYPE_FLOPPY_35_144];
-		fprintf( stderr, "%s: default disk type is 3.5\" floppy\n", flomod.exename );
+		if ( flomod.flags & FLOMOD_FLAG_VERBOSE ) fprintf( stderr, "%s: default disk type is 3.5\" floppy\n", flomod.exename );
 	}
 
 	//Base 1 sector numeration
@@ -89,7 +91,10 @@ int main( int argc, char **argv )
 		if ( access( flomod.diskfname, F_OK ) != -1 )
 			flomod.diskf = fopen( flomod.diskfname, "r+b" ); //If file exists
 		else
+		{
+			if ( flomod.flags & FLOMOD_FLAG_VERBOSE ) fprintf( stderr, "%s: creating '%s'\n", flomod.exename, flomod.diskfname );
 			flomod.diskf = fopen( flomod.diskfname, "wb" ); //If file doesn't exist
+		}
 	}
 	else
 	{
@@ -134,8 +139,8 @@ int main( int argc, char **argv )
 	chsb2str( &flomod.end );
 
 	//Output start and end position
-	fprintf( stderr, "%s: start at %s - %ld\n", flomod.exename, flomod.start.str, flomod.start.offset );
-	fprintf( stderr, "%s: end at   %s - %ld\n", flomod.exename, flomod.end.str, flomod.end.offset );
+	if ( flomod.flags & FLOMOD_FLAG_VERBOSE ) fprintf( stderr, "%s: start at %s - %ld\n", flomod.exename, flomod.start.str, flomod.start.offset );
+	if ( flomod.flags & FLOMOD_FLAG_VERBOSE ) fprintf( stderr, "%s: end at   %s - %ld\n", flomod.exename, flomod.end.str, flomod.end.offset );
 
 	if ( flomod.flags & FLOMOD_FLAG_WRITE )
 	{
@@ -151,7 +156,7 @@ int main( int argc, char **argv )
 	}
 
 	//EOF message
-	if ( b == EOF ) fprintf( stderr, "%s: EOF reached\n", flomod.exename );
+	if ( b == EOF && flomod.flags & FLOMOD_FLAG_VERBOSE ) fprintf( stderr, "%s: EOF reached\n", flomod.exename );
 
 	//Close disk file
 	fclose( flomod.diskf );
