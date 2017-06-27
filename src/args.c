@@ -32,8 +32,7 @@ struct argp_option argp_options[] =
 	{"end",    'e', "C:H:S:B",  0, "Set end point for disk operation"},
 	{"num",    'n', "C:H:S:B",  0, "Set disk operation length"},
 	{"geom",   'g', "C:H:S:B",  0, "Set disk geometry limits"},
-	{"type",   't', "TYPE",     0, "Set disk type:\n" \
-  	"FLOPPY_3.5_740K / FLOPPY_3.5_1.44M / FLOPPY_3.5_2.88M / FLOPPY_5.25_1.2M / FLOPPY_5.25_360K\n"},
+	{"type",   't', "TYPE",     0, "Set disk type (see manpage for list)"},
 
 	{0}
 };
