@@ -113,6 +113,13 @@ int main( int argc, char **argv )
 		}
 	}
 
+	//Check for invalid disk geometry
+	if ( flomod.limits.c == 0 || flomod.limits.h == 0 || flomod.limits.s == 0 || flomod.limits.b == 0 )
+	{
+		fprintf( stderr, "%s: invalid disk geometry!\n", flomod.exename );
+		exit( 1 );
+	}
+
 	//No filename
 	if ( flomod.diskfname == NULL )
 	{
