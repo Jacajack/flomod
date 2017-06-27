@@ -1,4 +1,4 @@
-.TH flomod 1 "27 June 2017" "v0.5"
+.TH flomod 1 "27 June 2017" "v0.6"
 .SH NAME
 .PP
 \fBflomod\fP \- floppy disk image editor.
@@ -12,9 +12,9 @@ It's relatively easy to use and can be pretty powerful tool when used along with
 .PP
 Supported command line options:
  \- \fB\fC\-1\fR / \fB\fC\-\-baseone\fR \- Sector numbers begin with 1 (like in BIOS interrupt 13h)
- \- \fB\fC\-e\fR / \fB\fC\-\-end\fR \- Specify end point of read/write operation in C:H:S:B format (overrides \fB\fC\-n\fR flag)
  \- \fB\fC\-d\fR / \fB\fC\-\-dump\fR \- Display written/read data along with its addresses in hex format
- \- \fB\fC\-l\fR / \fB\fC\-\-limits\fR \- Manually define disk geometry
+ \- \fB\fC\-e\fR / \fB\fC\-\-end\fR \- Specify end point of read/write operation in C:H:S:B format (overrides \fB\fC\-n\fR flag)
+ \- \fB\fC\-g\fR / \fB\fC\-\-geom\fR \- Manually define disk geometry
  \- \fB\fC\-n\fR / \fB\fC\-\-num\fR \- Specify length of read/write operation in C:H:S:B format
  \- \fB\fC\-r\fR / \fB\fC\-\-read\fR \- Read data from the image file
  \- \fB\fC\-s\fR / \fB\fC\-\-start\fR \- Specify start point of read/write operation in C:H:S:B format
@@ -32,11 +32,13 @@ Predefined disk geometries:
 .SH EXAMPLES
 .PP
 Read 12th sector from track 5, side 1:
-    \fB\fCflomod \-s 5:0:12:0 \-n 0:0:1:0\fR
+    \fB\fCflomod \-s 5:0:12:0 \-n 0:0:1:0 file.bin\fR
 Read sectors from 3 to 12 from track 7, side 2:
-    \fB\fCflomod \-s 7:1:3:0 \-e 7:1:5:0\fR
+    \fB\fCflomod \-s 7:1:3:0 \-e 7:1:5:0 file.bin\fR
 Read bytes 100\-200 from first sector from track 0, side 1 and be verbose (base 1 sector numbering):
-    \fB\fCflomod \-1 \-v \-s 0:0:1:100 \-e 0:0:1:200\fR
+    \fB\fCflomod \-1 \-v \-s 0:0:1:100 \-e 0:0:1:200 file.bin\fR
+Dump data from floppy that has 2 sides (heads) and 45 sectors (512b) on each one of 70 tracks:
+    \fB\fCflomod \-d \-g 70:2:45:512 file.bin\fR
 .SH AUTHOR
 .PP
 Flomod has been created by Jacek Wieczorek \[la]mrjjot@gmail.com\[ra]
