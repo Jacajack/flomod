@@ -12,9 +12,9 @@ It's relatively easy to use and can be pretty powerful tool when used along with
 
 Supported command line options:
  - `-1` / `--baseone` - Sector numbers begin with 1 (like in BIOS interrupt 13h)
- - `-e` / `--end` - Specify end point of read/write operation in C:H:S:B format (overrides `-n` flag)
  - `-d` / `--dump` - Display written/read data along with its addresses in hex format
- - `-l` / `--limits` - Manually define disk geometry
+ - `-e` / `--end` - Specify end point of read/write operation in C:H:S:B format (overrides `-n` flag)
+ - `-g` / `--geom` - Manually define disk geometry
  - `-n` / `--num` - Specify length of read/write operation in C:H:S:B format
  - `-r` / `--read` - Read data from the image file
  - `-s` / `--start` - Specify start point of read/write operation in C:H:S:B format
@@ -39,7 +39,7 @@ Read sectors from 3 to 12 from track 7, side 2:
 Read bytes 100-200 from first sector from track 0, side 1 and be verbose (base 1 sector numbering):
 	`flomod -1 -v -s 0:0:1:100 -e 0:0:1:200 file.bin`
 Dump data from floppy that has 2 sides (heads) and 45 sectors (512b) on each one of 70 tracks:
-	`flomod -d -l 70:2:45:512 file.bin`
+	`flomod -d -g 70:2:45:512 file.bin`
 
 ## AUTHOR
 Flomod has been created by Jacek Wieczorek <mrjjot@gmail.com>

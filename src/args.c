@@ -31,7 +31,7 @@ struct argp_option argp_options[] =
 	{"start",  's', "C:H:S:B",  0, "Set start point for disk operation"},
 	{"end",    'e', "C:H:S:B",  0, "Set end point for disk operation"},
 	{"num",    'n', "C:H:S:B",  0, "Set disk operation length"},
-	{"limits", 'l', "C:H:S:B",  0, "Set disk geometry limits"},
+	{"geom",   'g', "C:H:S:B",  0, "Set disk geometry limits"},
 	{"type",   't', "TYPE",     0, "Set disk type:\n" \
   	"FLOPPY_3.5_740K / FLOPPY_3.5_1.44M / FLOPPY_3.5_2.88M / FLOPPY_5.25_1.2M / FLOPPY_5.25_360K\n"},
 
@@ -77,7 +77,7 @@ error_t parse_opt( int key, char *arg, struct argp_state *state )
 	    	conf->length.str = arg;
 	    	break;
 
-		case 'l':
+		case 'g':
 			conf->geom.str = arg;
 			break;
 

@@ -21,7 +21,7 @@ Supported command line options:
  - `-s` / `--start` - Specify start point of read/write operation in C:H:S:B format
  - `-e` / `--end` - Specify end point of read/write operation in C:H:S:B format (overrides `-n` flag)
  - `-n` / `--num` - Specify length of read/write operation in C:H:S:B format
- - `-l` / `--limits` - Manually define disk geometry
+ - `-g` / `--geom` - Manually define disk geometry
  - `-t` / `--type` - Specify disk geometry preset
  - `-d` / `--dump` - Display written/read data along with its addresses in hex format
  - `-u` / `--uppercase` - Output uppercase text, when decrypting
