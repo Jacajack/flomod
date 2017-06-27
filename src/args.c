@@ -9,6 +9,7 @@ struct argp_option argp_options[] =
 {
 	{"read",   'r', 0,          0, "Read data from disk"},
 	{"write",  'w', 0,          0, "Write data to disk"},
+	{"dump",   'd', 0,          0, "Dump read/written data in hex format"},
 	{"verbose",'v', 0,          0, "Be verbose"},
 	{"baseone",'1', 0,          0, "Use 1 based sector numeration (like int 13h)"},
 	{"start",  's', "C:H:S:B",  0, "Set start point for disk operation"},
@@ -39,6 +40,10 @@ error_t parse_opt( int key, char *arg, struct argp_state *state )
 		case 'w':
     		conf->flags |= FLOMOD_FLAG_WRITE;
     		break;
+
+		case 'd':
+			conf->flags |= FLOMOD_FLAG_DUMP;
+			break;
 
 		case '1':
 			conf->flags |= FLOMOD_FLAG_SECTOR_BASE1;

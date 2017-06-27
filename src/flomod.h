@@ -7,6 +7,7 @@
 #define FLOMOD_FLAG_SECTOR_BASE1 2
 #define FLOMOD_FLAG_DEFAULT_FLOPPY 4
 #define FLOMOD_FLAG_VERBOSE 8
+#define FLOMOD_FLAG_DUMP 16
 
 //Flomod configuration structure
 struct flomod

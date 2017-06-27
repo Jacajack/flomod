@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <ctype.h>
 #include <argp.h>
 #include "chsb.h"
 #include "disktypes.h"
@@ -11,6 +12,52 @@
 
 //Main configuration structure (all flags etc.)
 struct flomod flomod;
+
+void dump( long start, long current, unsigned char b )
+{
+	#define DUMP_WIDTH 8
+	static unsigned char buf[DUMP_WIDTH];
+	CHSB pos = {0};
+	int i;
+
+	//If we are at line begining
+	if ( ( current - start ) % DUMP_WIDTH == 0 )
+	{
+		if ( current == start )
+		{
+			//If we are at start - print lovely header
+			printf( "| cyl  | head | sect | byte | ---\n" );
+		}
+		else printf( "\n" );
+
+		//Convert LBA to CHSB
+		pos.offset = current;
+		if ( flomod.flags & FLOMOD_FLAG_SECTOR_BASE1 ) pos.flags |= CHSB_FLAG_SECTOR_BASE1;
+		lba2chsb( &pos, &flomod.limits );
+
+		//Print current position (CHSB)
+		printf( "| %4ld | %4ld | %4ld | %4ld | ", pos.c, pos.h, pos.s, pos.b );
+	}
+
+	//Store current byte in buffer and print it as hex
+	buf[( current - start ) % DUMP_WIDTH] = b;
+	printf( "%02x ", b );
+
+	//If we are at last byte in the line - dump buffer as characters
+	if ( ( current - start ) % DUMP_WIDTH == DUMP_WIDTH - 1 )
+	{
+		printf( "| " );
+
+		//Dump whole buffer, but skip whitespace characters
+		for ( i = 0; i < DUMP_WIDTH; i++ )
+			if ( !isspace( buf[i] ) )
+			{
+				printf( "%c", buf[i] );
+			}
+			else printf( "." );
+	}
+	#undef DUMP_WIDTH
+}
 
 int main( int argc, char **argv )
 {
@@ -139,24 +186,32 @@ int main( int argc, char **argv )
 	chsb2str( &flomod.end );
 
 	//Output start and end position
-	if ( flomod.flags & FLOMOD_FLAG_VERBOSE ) fprintf( stderr, "%s: start at %s - %ld\n", flomod.exename, flomod.start.str, flomod.start.offset );
-	if ( flomod.flags & FLOMOD_FLAG_VERBOSE ) fprintf( stderr, "%s: end at   %s - %ld\n", flomod.exename, flomod.end.str, flomod.end.offset );
+	if ( flomod.flags & FLOMOD_FLAG_VERBOSE ) fprintf( stderr, "%s: start at %16s - %8ld\n", flomod.exename, flomod.start.str, flomod.start.offset );
+	if ( flomod.flags & FLOMOD_FLAG_VERBOSE ) fprintf( stderr, "%s: end at   %16s - %8ld\n", flomod.exename, flomod.end.str, flomod.end.offset );
 
+	long offset = 0;
 	if ( flomod.flags & FLOMOD_FLAG_WRITE )
 	{
 		//Write to disk file
-		while ( ( ( b = getchar( ) ) != EOF ) && ( ftell( flomod.diskf ) <= flomod.end.offset ) )
+		while ( ( ( b = getchar( ) ) != EOF ) && ( ( offset = ftell( flomod.diskf ) ) <= flomod.end.offset ) )
+		{
+			if ( flomod.flags & FLOMOD_FLAG_DUMP ) dump( flomod.start.offset, offset, b );
 			fputc( b, flomod.diskf );
+		}
 	}
 	else
 	{
 		//Read from disk file
-		while ( ( ( b = fgetc( flomod.diskf ) ) != EOF ) && ( ftell( flomod.diskf ) <= flomod.end.offset ) )
-			putchar( b );
+		while ( ( ( b = fgetc( flomod.diskf ) ) != EOF ) && ( ( offset = ftell( flomod.diskf ) ) <= flomod.end.offset ) )
+			if ( flomod.flags & FLOMOD_FLAG_DUMP ) dump( flomod.start.offset, offset - 1, b );
+			else putchar( b );
 	}
 
+	//Additional newline after dump
+	if ( flomod.flags & FLOMOD_FLAG_DUMP ) printf( "\n" );
+
 	//EOF message
-	if ( b == EOF && flomod.flags & FLOMOD_FLAG_VERBOSE ) fprintf( stderr, "%s: EOF reached\n", flomod.exename );
+	if ( b == EOF && flomod.flags & FLOMOD_FLAG_VERBOSE ) fprintf( stderr, "%s: EOF reached!\n", flomod.exename );
 
 	//Close disk file
 	fclose( flomod.diskf );
