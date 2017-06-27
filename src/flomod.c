@@ -49,7 +49,7 @@ void dump( long start, long current, unsigned char b )
 		//Convert LBA to CHSB
 		pos.offset = current;
 		if ( flomod.flags & FLOMOD_FLAG_SECTOR_BASE1 ) pos.flags |= CHSB_FLAG_SECTOR_BASE1;
-		lba2chsb( &pos, &flomod.limits );
+		lba2chsb( &pos, &flomod.geom );
 
 		//Print current position (CHSB)
 		printf( "|%6ld|%6ld|%6ld|%6ld| ", pos.c, pos.h, pos.s, pos.b );
@@ -87,8 +87,8 @@ int main( int argc, char **argv )
 	argp_parse( &argp, argc, argv, 0, 0, &flomod );
 
 	//Setup CHSB limits
-	str2chsb( &flomod.limits );
-	if ( chsbnull( &flomod.limits ) ) //Skip if set by user
+	str2chsb( &flomod.geom );
+	if ( chsbnull( &flomod.geom ) ) //Skip if set by user
 	{
 		//Default disk type if not specified
 		if ( flomod.disktype == NULL ) flomod.flags |= FLOMOD_FLAG_DEFAULT_FLOPPY;
@@ -99,7 +99,7 @@ int main( int argc, char **argv )
 			{
 				if ( !strcmp( disktypes[i].str, flomod.disktype ) )
 				{
-					flomod.limits = disktypes[i];
+					flomod.geom = disktypes[i];
 					break;
 				}
 			}
@@ -114,7 +114,7 @@ int main( int argc, char **argv )
 	}
 
 	//Check for invalid disk geometry
-	if ( flomod.limits.c == 0 || flomod.limits.h == 0 || flomod.limits.s == 0 || flomod.limits.b == 0 )
+	if ( flomod.geom.c == 0 || flomod.geom.h == 0 || flomod.geom.s == 0 || flomod.geom.b == 0 )
 	{
 		fprintf( stderr, "%s: invalid disk geometry!\n", flomod.exename );
 		exit( 1 );
@@ -130,7 +130,7 @@ int main( int argc, char **argv )
 	//Default disk type
 	if ( flomod.flags & FLOMOD_FLAG_DEFAULT_FLOPPY )
 	{
-		flomod.limits = disktypes[DISKTYPE_FLOPPY_35_144];
+		flomod.geom = disktypes[DISKTYPE_FLOPPY_35_144];
 		if ( flomod.flags & FLOMOD_FLAG_VERBOSE ) fprintf( stderr, "%s: default disk type is 3.5\" floppy\n", flomod.exename );
 	}
 
@@ -140,19 +140,19 @@ int main( int argc, char **argv )
 		flomod.start.flags |= CHSB_FLAG_SECTOR_BASE1;
 		flomod.length.flags |= CHSB_FLAG_SECTOR_BASE1;
 		flomod.end.flags |= CHSB_FLAG_SECTOR_BASE1;
-		flomod.limits.flags |= CHSB_FLAG_SECTOR_BASE1;
+		flomod.geom.flags |= CHSB_FLAG_SECTOR_BASE1;
 	}
 
 	//Get start descriptor
 	str2chsb( &flomod.start );
-	chsbopt( &flomod.start, &flomod.limits );
-	chsb2lba( &flomod.start, &flomod.limits );
+	chsbopt( &flomod.start, &flomod.geom );
+	chsb2lba( &flomod.start, &flomod.geom );
 	chsb2str( &flomod.start );
 
 	//Get length
 	str2chsb( &flomod.length );
-	chsbopt( &flomod.length, &flomod.limits );
-	chsb2lba( &flomod.length, &flomod.limits );
+	chsbopt( &flomod.length, &flomod.geom );
+	chsb2lba( &flomod.length, &flomod.geom );
 
 	//Open disk file
 	if ( flomod.flags & FLOMOD_FLAG_WRITE )
@@ -202,7 +202,7 @@ int main( int argc, char **argv )
 		{
 			//Calculate from detected file size
 			flomod.end.offset = flomod.disklen - 1;
-			lba2chsb( &flomod.end, &flomod.limits );
+			lba2chsb( &flomod.end, &flomod.geom );
 			fprintf( stderr, "%s: no endpoint specified - reading whole file\n", flomod.exename );
 		}
 		else
@@ -212,8 +212,8 @@ int main( int argc, char **argv )
 			chsbsum( &flomod.end, &flomod.length );
 		}
 	}
-	chsbopt( &flomod.end, &flomod.limits );
-	chsb2lba( &flomod.end, &flomod.limits );
+	chsbopt( &flomod.end, &flomod.geom );
+	chsb2lba( &flomod.end, &flomod.geom );
 	chsb2str( &flomod.end );
 
 	//Output start and end position

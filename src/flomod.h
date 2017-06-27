@@ -38,7 +38,7 @@ struct flomod
 	CHSB start;
 	CHSB length;
 	CHSB end;
-	CHSB limits;
+	CHSB geom;
 };
 
 #endif

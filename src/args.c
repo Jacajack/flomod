@@ -78,7 +78,7 @@ error_t parse_opt( int key, char *arg, struct argp_state *state )
 	    	break;
 
 		case 'l':
-			conf->limits.str = arg;
+			conf->geom.str = arg;
 			break;
 
 		case 't':
