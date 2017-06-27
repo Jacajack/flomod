@@ -28,3 +28,6 @@ uninstall:
 
 clean:
 	-rm flomod
+
+manpage:
+	md2man-roff doc/flomod.1.md > man/flomod.1

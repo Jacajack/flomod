@@ -36,7 +36,7 @@ Disk geometry presets include:
  - `FLOPPY_5.25_360K` - 5.25 inch floppy, 360KB (equivalent of 80:2:15:512)
  - `FLOPPY_5.25_1.2M` - 5.25 inch floppy, 1.2MB (equivalent of 40:2:9:512)
 
-For example, if you want to read 3<sup>rd</sup> from 7<sup>th</sup> track (side 2), you can use following command:<br>`flomod -s 7:1:3:0 -n 0:0:1:0 floppy.bin`.
+For example, if you want to read sector 3 from track 7 (side 2), you can use following command:<br>`flomod -s 7:1:3:0 -n 0:0:1:0 floppy.bin`.
 
 ## Building from source
  - Clone git repository - `git clone https://github.com/Jacajack/flomod.git && cd flomod`
