@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include "chsb.h"
 #include "disktypes.h"
+#include "args.h"
 
 #define FLOMOD_VERSION "v0.0"
 
@@ -46,7 +47,6 @@ void help( )
 int main( int argc, char **argv )
 {
 	int i, b;
-	unsigned char badarg, badval;
 
 	flomod.flags = FLOMOD_FLAG_SECTOR_BASE1;
 
@@ -58,87 +58,24 @@ int main( int argc, char **argv )
 		exit( 1 );
 	}
 
-	for ( i = 1; i < argc; i++ )
+	ArgParser args[] =
 	{
-		badval = 1;
-		badarg = 1;
+		{"-s", ARGPARSE_FLAG_VALUE, &flomod.start.str},
+		{"-n", ARGPARSE_FLAG_VALUE, &flomod.length.str},
+		{"-l", ARGPARSE_FLAG_VALUE, &flomod.limits.str},
+		{"-e", ARGPARSE_FLAG_VALUE, &flomod.end.str},
+		{"-t", ARGPARSE_FLAG_VALUE, &flomod.disktype},
+		{"-f", ARGPARSE_FLAG_VALUE, &flomod.diskfname},
+		{"-w"},
+		{"-r"},
+		{"-z"}
+	};
 
-		if ( !strcmp( argv[i], "-s" ) )
-		{
-			if ( badarg = 0, ++i < argc )
-			{
-				badval = 0;
-				flomod.start.str = strndup( argv[i], 1024 );
-			}
-			continue;
-		}
-
-		if ( !strcmp( argv[i], "-n" ) )
-		{
-			if ( badarg = 0, ++i < argc )
-			{
-				badval = 0;
-				flomod.length.str = strndup( argv[i], 1024 );
-			}
-			continue;
-		}
-
-		if ( !strcmp( argv[i], "-l" ) )
-		{
-			if ( badarg = 0, ++i < argc )
-			{
-				badval = 0;
-				flomod.limits.str = strndup( argv[i], 1024 );
-			}
-			continue;
-		}
-
-		if ( !strcmp( argv[i], "-e" ) )
-		{
-			if ( badarg = 0, ++i < argc )
-			{
-				badval = 0;
-				flomod.end.str = strndup( argv[i], 1024 );
-			}
-			continue;
-		}
-
-		if ( !strcmp( argv[i], "-t" ) )
-		{
-			if ( badarg = 0, ++i < argc )
-			{
-				badval = 0;
-				flomod.disktype = strndup( argv[i], 1024 );
-			}
-			continue;
-		}
-
-		if ( !strcmp( argv[i], "-f" ) )
-		{
-			if ( badarg = 0, ++i < argc )
-			{
-				badval = 0;
-				flomod.diskfname = strndup( argv[i], 1024 );
-			}
-			continue;
-		}
-
-		if ( !strcmp( argv[i], "-w" ) ) badarg = badval = 0, flomod.flags |= FLOMOD_FLAG_WRITE;
-		if ( !strcmp( argv[i], "-r" ) ) badarg = badval = 0, flomod.flags &= ~FLOMOD_FLAG_WRITE;
-		if ( !strcmp( argv[i], "-z" ) ) badarg = badval = 0, flomod.flags &= ~FLOMOD_FLAG_SECTOR_BASE1;
-
-
-		if ( badarg )
-		{
-			fprintf( stderr, "%s: unknown option '%s'\n", flomod.exename, argv[i] );
-			exit( 1 );
-		}
-
-		if ( badval )
-		{
-			fprintf( stderr, "%s: bad value for '%s'\n", flomod.exename, argv[i - 1] );
-			exit( 1 );
-		}
+	const char *argerr = argparse( args, sizeof( args ) / sizeof( args[0] ), argc - 1, argv + 1 );
+	if ( argerr != NULL )
+	{
+		fprintf( stderr, "%s: %s\n", flomod.exename, argerr );
+		exit( 1 );
 	}
 
 	//Setup CHSB limits

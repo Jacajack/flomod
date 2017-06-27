@@ -11,7 +11,7 @@ typedef struct
 	long s;
 	long b;
 	long offset;
-	const char *str;
+	char *str;
 	unsigned int flags;
 } CHSB;
 
