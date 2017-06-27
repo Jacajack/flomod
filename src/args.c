@@ -17,7 +17,7 @@
 #include <argp.h>
 #include "flomod.h"
 
-const char *argp_program_version = "flomod v0.1";
+const char *argp_program_version = "flomod v0.6";
 const char *argp_program_bug_address = "<mrjjot@gmail.com>";
 char argp_doc[] = "flomod - A program to edit floppy disk.";
 char argp_keydoc[] = "FILENAME";
