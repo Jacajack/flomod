@@ -114,7 +114,7 @@ int main( int argc, char **argv )
 	}
 
 	//Check for invalid disk geometry
-	if ( flomod.geom.c == 0 || flomod.geom.h == 0 || flomod.geom.s == 0 || flomod.geom.b == 0 )
+	if ( flomod.geom.c <= 0 || flomod.geom.h <= 0 || flomod.geom.s <= 0 || flomod.geom.b <= 0 )
 	{
 		fprintf( stderr, "%s: invalid disk geometry!\n", flomod.exename );
 		exit( 1 );
