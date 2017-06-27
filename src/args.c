@@ -15,8 +15,7 @@ struct argp_option argp_options[] =
   {"num",    'n', "C:H:S:B",  0, "Set disk operation length"},
   {"limits", 'l', "C:H:S:B",  0, "Set disk geometry limits"},
   {"type",   't', "TYPE",     0, "Set disk type:\n" \
-  	"\t- FLOPPY_3.5_1.44M\n" \
-	"\t- FLOPPY_3.5_2.88M\n"},
+  	"FLOPPY_3.5_740K / FLOPPY_3.5_1.44M / FLOPPY_3.5_2.88M / FLOPPY_5.25_1.2M / FLOPPY_5.25_360K\n"},
 
   {0}
 };
@@ -53,6 +52,10 @@ error_t parse_opt( int key, char *arg, struct argp_state *state )
 
 		case 'l':
 			conf->limits.str = arg;
+			break;
+
+		case 't':
+			conf->disktype = arg;
 			break;
 
 		case ARGP_KEY_ARG:
