@@ -1,57 +1,71 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include "args.h"
+#include <argp.h>
+#include "flomod.h"
 
-const char *argparse( ArgParser *conf, int conflen, int argc, char **argv )
+const char *argp_program_version = "flomod v0.1";
+const char *argp_program_bug_address = "<mrjjot@gmail.com>";
+char argp_doc[] = "flomod - A program to edit floppy disk.";
+char argp_keydoc[] = "FILENAME";
+struct argp_option argp_options[] =
 {
-	int i, j, buflen;
-	char *buf;
+  {"read",   'r', 0,          0, "Read data from disk"},
+  {"write",  'w', 0,          0, "Write data to disk"},
+  {"verbose",'v', 0,          0, "Be verbose"},
+  {"start",  's', "C:H:S:B",  0, "Set start point for disk operation"},
+  {"end",    'e', "C:H:S:B",  0, "Set end point for disk operation"},
+  {"num",    'n', "C:H:S:B",  0, "Set disk operation length"},
+  {"limits", 'l', "C:H:S:B",  0, "Set disk geometry limits"},
+  {"type",   't', "TYPE",     0, "Set disk type:\n" \
+  	"\t- FLOPPY_3.5_1.44M\n" \
+	"\t- FLOPPY_3.5_2.88M\n"},
 
-	for ( i = 0; i < argc; i++ )
+  {0}
+};
+
+error_t parse_opt( int key, char *arg, struct argp_state *state )
+{
+	struct flomod *conf = (struct flomod*) state->input;
+
+	switch ( key )
 	{
-		for ( j = 0; j < conflen; j++ )
-		{
-			//Attempt to match option name
-			if ( !strcmp( argv[i], conf[j].optname ) )
-			{
-				//Flag argument as matched
-				conf[j].flags |= ARGPARSE_FLAG_MATCH;
+		case 'v':
+			conf->flags |= FLOMOD_FLAG_VERBOSE;
+			break;
 
-				//Argument is followed by its value
-				if ( conf[j].flags & ARGPARSE_FLAG_VALUE )
-				{
-					if ( i + 1 < argc && argv[i + 1] != NULL )
-					{
-						conf[j].str = strdup( argv[i + 1] );
-						*conf[j].destptr = conf[j].str;
-						++i;
-					}
-					else
-					{
-						//User later needs to free memory allocated here!
-						buflen = snprintf( NULL, 0, "bad value for '%s'", argv[i] );
-						buf = (char*) malloc( buflen * sizeof( char ) );
-						if ( buf == NULL ) return "malloc error";
-						snprintf( buf, buflen, "bad value for '%s'", argv[i] );
-						return buf;
-					}
-				}
-				break;
-			}
-		}
+		case 'r':
+			conf->flags &= ~FLOMOD_FLAG_WRITE;
+			break;
 
-		if ( j == conflen )
-		{
-			//User later needs to free memory allocated here!
-			buflen = snprintf( NULL, 0, "unknown argument '%s'", argv[i] );
-			buf = (char*) malloc( buflen * sizeof( char ) );
-			if ( buf == NULL ) return "malloc error";
-			snprintf( buf, buflen, "unknown argument '%s'", argv[i] );
-			return buf;
-		}
-	}
+		case 'w':
+    		conf->flags |= FLOMOD_FLAG_WRITE;
+    		break;
 
-	//On success do not return anything
-	return NULL;
+		case 's':
+    		conf->start.str = arg;
+    		break;
+
+		case 'e':
+			conf->end.str = arg;
+			break;
+
+		case 'n':
+	    	conf->length.str = arg;
+	    	break;
+
+		case 'l':
+			conf->limits.str = arg;
+			break;
+
+		case ARGP_KEY_ARG:
+    		if ( state->arg_num >= 1 ) argp_usage( state );
+			conf->diskfname = arg;
+			break;
+
+		case ARGP_KEY_END:
+    		if ( state->arg_num < 1 ) argp_usage( state );
+    		break;
+
+    	default:
+    		return ARGP_ERR_UNKNOWN;
+    }
+	return 0;
 }

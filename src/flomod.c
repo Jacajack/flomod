@@ -3,80 +3,25 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <argp.h>
 #include "chsb.h"
 #include "disktypes.h"
 #include "args.h"
+#include "flomod.h"
 
-#define FLOMOD_VERSION "v0.0"
 
-#define FLOMOD_FLAG_WRITE 1
-#define FLOMOD_FLAG_SECTOR_BASE1 2
-#define FLOMOD_FLAG_DEFAULT_FLOPPY 4
+struct flomod flomod;
 
-struct
-{
-	unsigned int flags;
-	char *exename;
-
-	char *disktype;
-	char *diskfname;
-	FILE *diskf;
-	long disklen;
-	CHSB start;
-	CHSB length;
-	CHSB end;
-	CHSB limits;
-} flomod;
-
-void help( )
-{
-	fprintf( stderr,
-		"%s - floppy disk editor " FLOMOD_VERSION "\n" \
-		"Usage: %s filename [OPTIONS]\n" \
-		"\t-h - display this help message\n" \
-		"\t-s - specify start point in C:H:S:B format\n" \
-		"\t-n - specify read/write length in C:H:S:B format\n" \
-		"\t-e - specify end point in C:H:S:B format\n" \
-		"\t-l - specify disk geometry in C:H:S:B format\n" \
-		"\t-t - specify disk geometry from predefined list:\n" \
-		"\t\t- FLOPPY_3.5_1.44M\n" \
-		"\t\t- FLOPPY_3.5_2.88M\n" \
-		, flomod.exename, flomod.exename );
-}
 
 int main( int argc, char **argv )
 {
 	int i, b;
 
 	flomod.flags = FLOMOD_FLAG_SECTOR_BASE1;
+	flomod.exename = "flomod";
 
-	if ( argc >= 1 ) flomod.exename = argv[0];
-
-	if ( argc < 2 )
-	{
-		help( );
-		exit( 1 );
-	}
-
-	ArgParser args[] =
-	{
-		{"-s", ARGPARSE_FLAG_VALUE, &flomod.start.str},
-		{"-n", ARGPARSE_FLAG_VALUE, &flomod.length.str},
-		{"-l", ARGPARSE_FLAG_VALUE, &flomod.limits.str},
-		{"-e", ARGPARSE_FLAG_VALUE, &flomod.end.str},
-		{"-t", ARGPARSE_FLAG_VALUE, &flomod.disktype},
-		{"-f", ARGPARSE_FLAG_VALUE, &flomod.diskfname},
-		{"-w"},
-		{"-r"},
-		{"-z"}
-	};
-
-	const char *argerr = argparse( args, sizeof( args ) / sizeof( args[0] ), argc - 1, argv + 1 );
-	if ( argerr != NULL )
-	{
-		fprintf( stderr, "%s: %s\n", flomod.exename, argerr );
-		exit( 1 );
-	}
+	static struct argp argp = {argp_options, parse_opt, argp_keydoc, argp_doc};
+	argp_parse( &argp, argc, argv, 0, 0, &flomod );
 
 	//Setup CHSB limits
 	str2chsb( &flomod.limits );

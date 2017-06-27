@@ -1,21 +1,12 @@
 #ifndef ARGS_H
 #define ARGS_H
+#include <argp.h>
 
-#define ARGPARSE_ERROR_OK 0
-#define ARGPARSE_ERROR_NOMATCH 1
-#define ARGPARSE_ERROR_BADVAL 2
-
-#define ARGPARSE_FLAG_VALUE 1
-#define ARGPARSE_FLAG_MATCH 2
-
-typedef struct
-{
-	const char *optname;
-	unsigned char flags;
-	char **destptr;
-	char *str;
-} ArgParser;
-
-const char *argparse( ArgParser *conf, int conflen, int argc, char **argv );
+extern const char *argp_program_version;
+extern const char *argp_program_bug_address;
+extern char argp_doc[];
+extern char argp_keydoc[];
+extern struct argp_option argp_options[];
+extern error_t parse_opt( int key, char *arg, struct argp_state *state );
 
 #endif
