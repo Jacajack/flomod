@@ -42,7 +42,11 @@ int main( int argc, char **argv )
 			}
 
 			//Not found - default once more
-			if ( i == DISKTYPE_COUNT ) flomod.flags |= FLOMOD_FLAG_DEFAULT_FLOPPY;
+			if ( i == DISKTYPE_COUNT )
+			{
+				fprintf( stderr, "%s: unknown disk type\n", flomod.exename );
+				flomod.flags |= FLOMOD_FLAG_DEFAULT_FLOPPY;
+			}
 		}
 	}
 
@@ -57,7 +61,7 @@ int main( int argc, char **argv )
 	if ( flomod.flags & FLOMOD_FLAG_DEFAULT_FLOPPY )
 	{
 		flomod.limits = disktypes[DISKTYPE_FLOPPY_35_144];
-		fprintf( stderr, "%s: disk type not specified - default is 3.5\" floppy\n", flomod.exename );
+		fprintf( stderr, "%s: default disk type is 3.5\" floppy\n", flomod.exename );
 	}
 
 	//Base 1 sector numeration
