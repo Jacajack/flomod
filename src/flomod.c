@@ -52,7 +52,7 @@ void dump( long start, long current, unsigned char b )
 		lba2chsb( &pos, &flomod.limits );
 
 		//Print current position (CHSB)
-		printf( "| %4ld | %4ld | %4ld | %4ld | ", pos.c, pos.h, pos.s, pos.b );
+		printf( "|%6ld|%6ld|%6ld|%6ld| ", pos.c, pos.h, pos.s, pos.b );
 	}
 
 	//Store current byte in buffer and print it as hex
