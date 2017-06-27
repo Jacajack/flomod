@@ -9,17 +9,15 @@
 #include "args.h"
 #include "flomod.h"
 
-
 struct flomod flomod;
-
 
 int main( int argc, char **argv )
 {
 	int i, b;
 
-	flomod.flags = FLOMOD_FLAG_SECTOR_BASE1;
 	flomod.exename = "flomod";
 
+	//Parse command line arguments
 	static struct argp argp = {argp_options, parse_opt, argp_keydoc, argp_doc};
 	argp_parse( &argp, argc, argv, 0, 0, &flomod );
 
@@ -87,14 +85,19 @@ int main( int argc, char **argv )
 	//Open disk file
 	if ( flomod.flags & FLOMOD_FLAG_WRITE )
 	{
+		//Attempt to open for writing
 		if ( access( flomod.diskfname, F_OK ) != -1 )
-			flomod.diskf = fopen( flomod.diskfname, "r+b" );
-		else flomod.diskf = fopen( flomod.diskfname, "wb" );
+			flomod.diskf = fopen( flomod.diskfname, "r+b" ); //If file exists
+		else
+			flomod.diskf = fopen( flomod.diskfname, "wb" ); //If file doesn't exist
 	}
 	else
 	{
+		//Open only for reading
 		flomod.diskf = fopen( flomod.diskfname, "rb" );
 	}
+
+	//If file could not be opened
 	if ( flomod.diskf == NULL )
 	{
 		fprintf( stderr, "%s: could not open '%s'\n", flomod.exename, flomod.diskfname );
@@ -130,20 +133,24 @@ int main( int argc, char **argv )
 	chsb2lba( &flomod.end, &flomod.limits );
 	chsb2str( &flomod.end );
 
+	//Output start and end position
 	fprintf( stderr, "%s: start at %s - %ld\n", flomod.exename, flomod.start.str, flomod.start.offset );
 	fprintf( stderr, "%s: end at   %s - %ld\n", flomod.exename, flomod.end.str, flomod.end.offset );
 
 	if ( flomod.flags & FLOMOD_FLAG_WRITE )
 	{
+		//Write to disk file
 		while ( ( ( b = getchar( ) ) != EOF ) && ( ftell( flomod.diskf ) <= flomod.end.offset ) )
 			fputc( b, flomod.diskf );
 	}
 	else
 	{
+		//Read from disk file
 		while ( ( ( b = fgetc( flomod.diskf ) ) != EOF ) && ( ftell( flomod.diskf ) <= flomod.end.offset ) )
 			putchar( b );
 	}
 
+	//EOF message
 	if ( b == EOF ) fprintf( stderr, "%s: EOF reached\n", flomod.exename );
 
 	//Close disk file

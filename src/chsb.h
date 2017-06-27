@@ -4,6 +4,7 @@
 
 #define CHSB_FLAG_SECTOR_BASE1 1
 
+//CHSB structure
 typedef struct
 {
 	long c;

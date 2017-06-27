@@ -21,6 +21,7 @@ struct argp_option argp_options[] =
 	{0}
 };
 
+//Lovely callback for ARGP to parse command line options
 error_t parse_opt( int key, char *arg, struct argp_state *state )
 {
 	struct flomod *conf = (struct flomod*) state->input;

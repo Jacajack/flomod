@@ -8,6 +8,7 @@
 #define FLOMOD_FLAG_DEFAULT_FLOPPY 4
 #define FLOMOD_FLAG_VERBOSE 8
 
+//Flomod configuration structure
 struct flomod
 {
 	unsigned int flags;
@@ -22,4 +23,5 @@ struct flomod
 	CHSB end;
 	CHSB limits;
 };
+
 #endif
