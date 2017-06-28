@@ -113,25 +113,18 @@ int main( int argc, char **argv )
 		}
 	}
 
-	//Check for invalid disk geometry
-	if ( flomod.geom.c <= 0 || flomod.geom.h <= 0 || flomod.geom.s <= 0 || flomod.geom.b <= 0 )
-	{
-		fprintf( stderr, "%s: invalid disk geometry!\n", flomod.exename );
-		exit( 1 );
-	}
-
-	//No filename
-	if ( flomod.diskfname == NULL )
-	{
-		if ( flomod.flags & FLOMOD_FLAG_VERBOSE ) fprintf( stderr, "%s: disk file not specified!\n", flomod.exename );
-		exit( 1 );
-	}
-
 	//Default disk type
 	if ( flomod.flags & FLOMOD_FLAG_DEFAULT_FLOPPY )
 	{
 		flomod.geom = disktypes[DISKTYPE_FLOPPY_35_144];
 		if ( flomod.flags & FLOMOD_FLAG_VERBOSE ) fprintf( stderr, "%s: default disk type is 3.5\" floppy\n", flomod.exename );
+	}
+
+	//Check for invalid disk geometry
+	if ( flomod.geom.c <= 0 || flomod.geom.h <= 0 || flomod.geom.s <= 0 || flomod.geom.b <= 0 )
+	{
+		fprintf( stderr, "%s: invalid disk geometry!\n", flomod.exename );
+		exit( 1 );
 	}
 
 	//Base 1 sector numeration
@@ -153,6 +146,13 @@ int main( int argc, char **argv )
 	str2chsb( &flomod.length );
 	chsbopt( &flomod.length, &flomod.geom );
 	chsb2lba( &flomod.length, &flomod.geom );
+
+	//No filename
+	if ( flomod.diskfname == NULL )
+	{
+		if ( flomod.flags & FLOMOD_FLAG_VERBOSE ) fprintf( stderr, "%s: disk file not specified!\n", flomod.exename );
+		exit( 1 );
+	}
 
 	//Open disk file
 	if ( flomod.flags & FLOMOD_FLAG_WRITE )
