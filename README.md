@@ -2,7 +2,7 @@
 [![The GPL License](https://img.shields.io/badge/license-GPL-yellow.svg?style=flat-square)](https://opensource.org/licenses/GPL-3.0)
 [![Travis CI](https://img.shields.io/travis/Jacajack/flomod.svg?style=flat-square)](https://travis-ci.org/Jacajack/flomod)
 
-[Cmorse on launchpad...](https://launchpad.net/flomod)
+[Flomod on launchpad...](https://launchpad.net/flomod)
 
 `flomod` is a floppy disk image editor - it allows user to read or modify given sectors, tracks or bytes on floppy disk or its image.
 It's relatively easy to use and can be pretty powerful tool when used along with other UNIX commands.
