@@ -19,7 +19,6 @@ Supported command line options:
  \- \fB\fC\-r\fR / \fB\fC\-\-read\fR \- Read data from the image file
  \- \fB\fC\-s\fR / \fB\fC\-\-start\fR \- Specify start point of read/write operation in C:H:S:B format
  \- \fB\fC\-t\fR / \fB\fC\-\-type\fR \- Specify disk geometry preset
- \- \fB\fC\-u\fR / \fB\fC\-\-uppercase\fR \- Output uppercase text, when decrypting
  \- \fB\fC\-v\fR / \fB\fC\-\-verbose\fR \- Be more verbose about what's going on
  \- \fB\fC\-w\fR / \fB\fC\-\-write\fR \- Write data from \fB\fCstdin\fR to the image file
 .PP
@@ -33,10 +32,13 @@ Predefined disk geometries:
 .PP
 Read 12th sector from track 5, side 1:
     \fB\fCflomod \-s 5:0:12:0 \-n 0:0:1:0 file.bin\fR
+.PP
 Read sectors from 3 to 12 from track 7, side 2:
     \fB\fCflomod \-s 7:1:3:0 \-e 7:1:5:0 file.bin\fR
+.PP
 Read bytes 100\-200 from first sector from track 0, side 1 and be verbose (base 1 sector numbering):
     \fB\fCflomod \-1 \-v \-s 0:0:1:100 \-e 0:0:1:200 file.bin\fR
+.PP
 Dump data from floppy that has 2 sides (heads) and 45 sectors (512b) on each one of 70 tracks:
     \fB\fCflomod \-d \-g 70:2:45:512 file.bin\fR
 .SH AUTHOR

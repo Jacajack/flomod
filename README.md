@@ -24,7 +24,6 @@ Supported command line options:
  - `-g` / `--geom` - Manually define disk geometry
  - `-t` / `--type` - Specify disk geometry preset
  - `-d` / `--dump` - Display written/read data along with its addresses in hex format
- - `-u` / `--uppercase` - Output uppercase text, when decrypting
  - `-v` / `--verbose` - Be more verbose about what's going on
  - `-w` / `--write` - Write data from `stdin` to the image file
  - `-r` / `--read` - Read data from the image file

@@ -19,7 +19,6 @@ Supported command line options:
  - `-r` / `--read` - Read data from the image file
  - `-s` / `--start` - Specify start point of read/write operation in C:H:S:B format
  - `-t` / `--type` - Specify disk geometry preset
- - `-u` / `--uppercase` - Output uppercase text, when decrypting
  - `-v` / `--verbose` - Be more verbose about what's going on
  - `-w` / `--write` - Write data from `stdin` to the image file
 
@@ -34,10 +33,13 @@ Predefined disk geometries:
 ## EXAMPLES
 Read 12th sector from track 5, side 1:
 	`flomod -s 5:0:12:0 -n 0:0:1:0 file.bin`
+
 Read sectors from 3 to 12 from track 7, side 2:
 	`flomod -s 7:1:3:0 -e 7:1:5:0 file.bin`
+
 Read bytes 100-200 from first sector from track 0, side 1 and be verbose (base 1 sector numbering):
 	`flomod -1 -v -s 0:0:1:100 -e 0:0:1:200 file.bin`
+
 Dump data from floppy that has 2 sides (heads) and 45 sectors (512b) on each one of 70 tracks:
 	`flomod -d -g 70:2:45:512 file.bin`
 
