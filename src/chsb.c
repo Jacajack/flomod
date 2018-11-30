@@ -59,7 +59,7 @@ void chsbsum( CHSB *desc, CHSB *offset )
 	if ( desc == NULL || offset == NULL ) return;
 	desc->c += offset->c;
 	desc->h += offset->h;
-	desc->s += offset->s - ( desc->flags & CHSB_FLAG_SECTOR_BASE1 ? 1 : 0 );
+	desc->s += offset->s;
 	desc->b += offset->b;
 }
 
@@ -69,7 +69,7 @@ int chsbnull( CHSB *desc )
 	if ( desc == NULL ) return 1;
 	return 	desc->c == 0 && \
 			desc->h == 0 && \
-			( desc->s == 0 || ( desc->s == 1 && desc->flags & CHSB_FLAG_SECTOR_BASE1 ) ) && \
+			desc->s == 0 && \
 			desc->b == 0;
 }
 
@@ -103,7 +103,7 @@ int str2chsb( CHSB *desc )
 	if ( desc == NULL ) return 1;
 	desc->c = 0;
 	desc->h = 0;
-	desc->s = desc->flags & CHSB_FLAG_SECTOR_BASE1 ? 1 : 0;
+	desc->s = 0;
 	desc->b = 0;
 
 	if ( desc->str == NULL ) return 1;
@@ -138,7 +138,7 @@ const char *chsb2str( CHSB *desc )
 
 	if ( desc == NULL ) return NULL;
 
-	snprintf( str, 63, "%ld%s%ld%s%ld%s%ld", desc->c, delim, desc->h, delim, desc->s, delim, desc->b );
+	snprintf( str, sizeof str, "%ld%s%ld%s%ld%s%ld", desc->c, delim, desc->h, delim, desc->s, delim, desc->b );
 
 	desc->str = strdup( str );
 	return desc->str;
