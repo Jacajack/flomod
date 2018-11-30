@@ -23,16 +23,16 @@ char argp_doc[] = "flomod - A program to edit floppy disk.";
 char argp_keydoc[] = "FILENAME";
 struct argp_option argp_options[] =
 {
-	{"read",   'r', 0,          0, "Read data from disk"},
-	{"write",  'w', 0,          0, "Write data to disk"},
-	{"dump",   'd', 0,          0, "Dump read/written data in hex format"},
-	{"verbose",'v', 0,          0, "Be verbose"},
-	{"baseone",'1', 0,          0, "Use 1 based sector numeration (like int 13h)"},
-	{"start",  's', "C:H:S:B",  0, "Set start point for disk operation"},
-	{"end",    'e', "C:H:S:B",  0, "Set end point for disk operation"},
-	{"num",    'n', "C:H:S:B",  0, "Set disk operation length"},
-	{"geom",   'g', "C:H:S:B",  0, "Set disk geometry limits"},
-	{"type",   't', "TYPE",     0, "Set disk type (see manpage for list)"},
+	{"read",   'r', 0,			0, "Read data from disk"},
+	{"write",  'w', 0,			0, "Write data to disk"},
+	{"dump",   'd', 0,			0, "Dump read/written data in hex format"},
+	{"verbose",'v', 0,			0, "Be verbose"},
+	{"baseone",'1', 0,			0, "Use 1 based sector numeration (like int 13h)"},
+	{"start",  's', "C:H:S:B",	0, "Set start point for disk operation"},
+	{"end",	   'e', "C:H:S:B",	0, "Set end point for disk operation"},
+	{"num",	   'n', "C:H:S:B",	0, "Set disk operation length"},
+	{"geom",   'g', "C:H:S:B",	0, "Set disk geometry limits"},
+	{"type",   't', "TYPE",		0, "Set disk type (see manpage for list)"},
 
 	{0}
 };
@@ -53,8 +53,8 @@ error_t parse_opt( int key, char *arg, struct argp_state *state )
 			break;
 
 		case 'w':
-    		conf->flags |= FLOMOD_FLAG_WRITE;
-    		break;
+			conf->flags |= FLOMOD_FLAG_WRITE;
+			break;
 
 		case 'd':
 			conf->flags |= FLOMOD_FLAG_DUMP;
@@ -65,16 +65,16 @@ error_t parse_opt( int key, char *arg, struct argp_state *state )
 			break;
 
 		case 's':
-    		conf->start.str = arg;
-    		break;
+			conf->start.str = arg;
+			break;
 
 		case 'e':
 			conf->end.str = arg;
 			break;
 
 		case 'n':
-	    	conf->length.str = arg;
-	    	break;
+			conf->length.str = arg;
+			break;
 
 		case 'g':
 			conf->geom.str = arg;
@@ -85,16 +85,16 @@ error_t parse_opt( int key, char *arg, struct argp_state *state )
 			break;
 
 		case ARGP_KEY_ARG:
-    		if ( state->arg_num >= 1 ) argp_usage( state );
+			if ( state->arg_num >= 1 ) argp_usage( state );
 			conf->diskfname = arg;
 			break;
 
 		case ARGP_KEY_END:
-    		if ( state->arg_num < 1 ) argp_usage( state );
-    		break;
+			if ( state->arg_num < 1 ) argp_usage( state );
+			break;
 
-    	default:
-    		return ARGP_ERR_UNKNOWN;
-    }
+		default:
+			return ARGP_ERR_UNKNOWN;
+	}
 	return 0;
 }

@@ -67,7 +67,7 @@ void chsbsum( CHSB *desc, CHSB *offset )
 int chsbnull( CHSB *desc )
 {
 	if ( desc == NULL ) return 1;
-	return 	desc->c == 0 && \
+	return	desc->c == 0 && \
 			desc->h == 0 && \
 			desc->s == 0 && \
 			desc->b == 0;

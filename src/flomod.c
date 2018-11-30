@@ -42,7 +42,7 @@ void dump( long start, long current, unsigned char b )
 		if ( current == start )
 		{
 			//If we are at start - print lovely header
-			printf( "| cyl  | head | sect | byte | ---\n" );
+			printf( "| cyl	| head | sect | byte | ---\n" );
 		}
 		else printf( "\n" );
 
@@ -218,7 +218,7 @@ int main( int argc, char **argv )
 
 	//Output start and end position
 	if ( flomod.flags & FLOMOD_FLAG_VERBOSE ) fprintf( stderr, "%s: start at %16s - %8ld\n", flomod.exename, flomod.start.str, flomod.start.offset );
-	if ( flomod.flags & FLOMOD_FLAG_VERBOSE ) fprintf( stderr, "%s: end at   %16s - %8ld\n", flomod.exename, flomod.end.str, flomod.end.offset );
+	if ( flomod.flags & FLOMOD_FLAG_VERBOSE ) fprintf( stderr, "%s: end at	 %16s - %8ld\n", flomod.exename, flomod.end.str, flomod.end.offset );
 
 	long offset = 0;
 	if ( flomod.flags & FLOMOD_FLAG_WRITE )
